@@ -60,7 +60,7 @@ Change the settings of the bot to your liking, these are the main sections:
     wsMaxRetries: 5,
   },
   monitoring: {
-    walletAddresses: [],
+    walletAddresses: [], // wallet addresses to monitor for orders
     baseToken: "USDC", // Only USDC supported for now
     filters: {
       // Empty arrays mean no filtering, i.e., include all
@@ -96,6 +96,38 @@ Change the settings of the bot to your liking, these are the main sections:
 ```
 
 ## Configuration Guide
+
+### Monitoring
+**Wallets to monitor**:
+```ts
+{
+  walletAddresses: ["0x12345...", "0x98765..."],
+}
+```
+- List of wallets to follow
+- The bot will listen to any new orders from these wallets
+
+**Filters**:
+```ts
+{
+  filters: {
+      // Empty arrays mean no filtering, i.e., include all
+      // values are IDs and mean inclusion of only these IDs
+      sports: [], // sportIds
+      marketTypes: [], // marketTypeIds
+      leagues: [], // leagueIds
+      // odds range filter for original orders
+      // copied orders can have odds adjusted outside this range
+      minOdds: "0.2", // -> 0.2 means 20%
+      maxOdds: "0.8", // -> 0.8 means 80%
+      excludeParlay: true,
+      excludeLive: true,
+    },
+}
+```
+- Empty filter arrays mean no filtering
+- Values are IDs and mean inclusion of only these IDs, e.g. `sports: [1]` means only Basketball orders will be copied
+- minOdds/maxOdds determine range of odds that the original order must be in to be copied
 
 ### Odds Adjustment
 
@@ -168,6 +200,7 @@ Change the settings of the bot to your liking, these are the main sections:
 - Hard limits for order stakes
 - If adjusted original stake is below minStake then the stake for the copied order will be minStake
 - If adjusted original stake is above maxStake then the stake for the copied order will be maxStake
+- minStake needs to be at least $10 otherwise order will fail
 
 
 ### Filtering
@@ -191,7 +224,7 @@ Change the settings of the bot to your liking, these are the main sections:
 
 See [SX API Documentation](https://api.docs.sx.bet) for complete list of sports, leagues and marketType IDs.
 
-### Running the Bot
+## Running the Bot
 ```bash
 # Start
 npm start
@@ -204,7 +237,7 @@ npm start
 3. **Filter**: Order is checked against configured filters (sport, market type, odds range, etc.)
 4. **Modify**: Odds and stakes are adjusted according to configuration
 5. **Execute**: Copied order is signed with EIP-712 and submitted to the exchange
-6. **Track**: Order lifecycle is monitored for fills, cancellations, and settlements
+6. **Track**: Order lifecycle is monitored for fills and cancellations
 
 
 
